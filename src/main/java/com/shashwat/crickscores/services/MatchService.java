@@ -2,11 +2,13 @@ package com.shashwat.crickscores.services;
 
 import java.util.List;
 
-import com.shashwat.crickscores.models.entities.Match;
+import com.shashwat.crickscores.models.dtos.MatchDto;
 
 public interface MatchService {
 
-	List<Match> getLiveMatches();
+	List<MatchDto> getLiveMatches();
 	
-	List<Match> getAllMatches();
+	List<MatchDto> getCompletedMatches();
+	
+	List<MatchDto> getAllMatches();
 }

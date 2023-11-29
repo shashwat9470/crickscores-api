@@ -11,25 +11,16 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
-import com.shashwat.crickscores.models.entities.Match;
-import com.shashwat.crickscores.models.entities.MatchStatus;
-import com.shashwat.crickscores.repositories.MatchRepository;
+import com.shashwat.crickscores.models.MatchStatus;
+import com.shashwat.crickscores.models.dtos.MatchDto;
 import com.shashwat.crickscores.services.MatchService;
 
 @Service
 public class MatchServiceImpl implements MatchService{
 	
-	private MatchRepository matchRepository;
-	
-	//constructor injection
-	public MatchServiceImpl(MatchRepository mr){
-		this.matchRepository = mr;
-	}
+	private List<MatchDto> scrapeData() {
 
-	@Override
-	public List<Match> getLiveMatches() {
-		// TODO Auto-generated method stub
-		List<Match> matchList = new ArrayList<>();
+		List<MatchDto> allMatchList = new ArrayList<>();
 		
 		try {
 			String url = "https://www.cricbuzz.com/cricket-match/live-scores";
@@ -38,6 +29,7 @@ public class MatchServiceImpl implements MatchService{
 			Elements liveScoreElements = document.select("div.cb-mtch-lst.cb-tms-itm");
 			
 			for(Element element : liveScoreElements) {
+				
 				String teamsPlayingString = element.select("h3.cb-lv-scr-mtch-hdr").select("a").text();
 				String matchNumberVenueString = element.select("span.text-gray").text();
 				
@@ -54,7 +46,7 @@ public class MatchServiceImpl implements MatchService{
 				
 				String matchLinkString = element.select("h3.cb-lv-scr-mtch-hdr > a").attr("href").toString();
 				
-				Match match = Match.builder()
+				MatchDto match = MatchDto.builder()
 						.teamsPlaying(teamsPlayingString)
 						.matchNumber(matchNumberVenueString)
 						.battingTeam(battingTeamString)
@@ -68,37 +60,39 @@ public class MatchServiceImpl implements MatchService{
 						.build();
 				
 				match.setMatchStatus();
-				updateMatch(match);
 				
-				if(match.getStatus().equals(MatchStatus.LIVE)) {
-					matchList.add(match);
-				}
+				allMatchList.add(match);
 			}
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return matchList;
-	}
-	
-	private void updateMatch(Match m) {
-		Match match = this.matchRepository.findByTeamsPlaying(m.getTeamsPlaying()).orElse(null);
 		
-		if(match != null) {
-			m.setMatchId(match.getMatchId());
-			this.matchRepository.save(m);
-		}
-		else {
-			this.matchRepository.save(m);
-		}
+		return allMatchList;
+		
 	}
 
 	@Override
-	public List<Match> getAllMatches() {
+	public List<MatchDto> getLiveMatches() {
 		// TODO Auto-generated method stub
-		List<Match> allMatchesList = this.matchRepository.findAll();
-		return allMatchesList;
+		return this.scrapeData().stream()
+				.filter(m -> m.getStatus().equals(MatchStatus.LIVE))
+				.toList();
+	}
+
+	@Override
+	public List<MatchDto> getCompletedMatches() {
+		// TODO Auto-generated method stub
+		return this.scrapeData().stream()
+				.filter(m -> m.getStatus().equals(MatchStatus.COMPLETED))
+				.toList();
+	}
+
+	@Override
+	public List<MatchDto> getAllMatches() {
+		// TODO Auto-generated method stub
+		return this.scrapeData();
 	}
 
 }

@@ -1,13 +1,9 @@
-package com.shashwat.crickscores.models.entities;
+package com.shashwat.crickscores.models.dtos;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.shashwat.crickscores.models.MatchStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,13 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "cricket_match")
-public class Match {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int matchId;
+public class MatchDto {
 	
 	private String teamsPlaying;
 	
@@ -45,7 +36,6 @@ public class Match {
 	
 	private LocalDate matchDate;
 	
-	@Enumerated
 	private MatchStatus status;
 	
 	public void setMatchStatus() {
