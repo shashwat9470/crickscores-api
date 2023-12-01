@@ -44,7 +44,7 @@ public class MatchServiceImpl implements MatchService{
 				String textLiveString = element.select("div.cb-text-live").text();
 				String textCompleteString = element.select("div.cb-text-complete").text();
 				
-				String matchLinkString = element.select("h3.cb-lv-scr-mtch-hdr > a").attr("href").toString();
+				String matchLinkString = url.substring(0, 24) + element.select("h3.cb-lv-scr-mtch-hdr > a").attr("href").toString();
 				
 				MatchDto match = MatchDto.builder()
 						.teamsPlaying(teamsPlayingString)
